@@ -3,12 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package dao;
+package daos;
 
 import java.util.List;
 import java.util.Set;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import pojos.Contact;
@@ -21,9 +20,10 @@ import pojos.User;
  */
 public class ContactDAO {
 
-    private static Session session = null;
+    private static Session session;
+    private static ContactDAO contactDAOInstance;
 
-    public ContactDAO() {
+    private ContactDAO() {
 
         if (session == null) {
 
@@ -36,7 +36,14 @@ public class ContactDAO {
 
     }
 
-    public void addContact(String primaryPhone, Contact contact) {
+    public static synchronized ContactDAO getInstance() {
+        if (contactDAOInstance == null) {
+            contactDAOInstance = new ContactDAO();
+        }
+        return contactDAOInstance;
+    }
+
+    public Contact addContact(String primaryPhone, Contact contact) {
 
         session.beginTransaction();
 
@@ -53,9 +60,10 @@ public class ContactDAO {
             phone.setContact(contact);
             session.persist(phone);
         }
-
         session.getTransaction().commit();
 
+        contact.setContactPhoneses(null);
+        return contact;
     }
 
     public void updateContact(Contact contact) {

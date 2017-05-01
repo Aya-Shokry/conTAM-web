@@ -1,12 +1,11 @@
-package dao;
+package daos;
 
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
-import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import pojos.Contact;
 import pojos.User;
 import pojos.UserPhones;
 
@@ -21,9 +20,10 @@ import pojos.UserPhones;
  */
 public class UserDAO {
 
-    private static Session session = null;
+    private static Session session;
+    private static UserDAO userDAOInstance;
 
-    public UserDAO() {
+    private UserDAO() {
 
         if (session == null) {
             Configuration configuration = new Configuration();
@@ -35,18 +35,17 @@ public class UserDAO {
 
     }
 
+    public static synchronized UserDAO getInstance() {
+        if (userDAOInstance == null) {
+            userDAOInstance = new UserDAO();
+        }
+        return userDAOInstance;
+    }
+
     public void registerUser(User user) {
 
         session.beginTransaction();
         session.persist(user);
-
-        Set<UserPhones> userPhonesSet = user.getUserPhoneses();
-
-        for (UserPhones phone : userPhonesSet) {
-            phone.setUser(user);
-            session.persist(phone);
-        }
-
         session.getTransaction().commit();
 
     }
@@ -58,6 +57,13 @@ public class UserDAO {
                 .setParameter("password", password).uniqueResult();
 
         if (user != null) {
+            User userObj = (User) user;
+
+            userObj.setContacts(null);
+            for (Object userPhone : userObj.getUserPhoneses()) {
+                ((UserPhones) userPhone).setUser(null);
+            }
+
             return (User) user;
         }
 
@@ -66,8 +72,18 @@ public class UserDAO {
 
     public void updateUser(User user) {
 
+        user.setId((int) session.createQuery("select user.id from User user where user.phone =:phone")
+                .setParameter("phone", user.getPhone())
+                .uniqueResult());
+
         session.beginTransaction();
         session.update(user);
+        
+        for (Object phone : user.getUserPhoneses()) {
+            ((UserPhones) phone).setUser(user);
+            session.saveOrUpdate(phone);
+        }
+
         session.getTransaction().commit();
 
     }

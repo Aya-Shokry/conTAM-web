@@ -1,7 +1,11 @@
 pojos/ContactPhones.class
 pojos/UserPhones.class
+restfulwebservices/ConTAMServices.class
+restfulwebservices/ConTAMServicesInterface.class
+daos/UserDAO.class
 pojos/Contact.class
 com/jets/contam/TestClass.class
 pojos/User.class
-dao/UserDAO.class
-dao/ContactDAO.class
+daos/ContactDAO.class
+restfulwebservices/ConTAMServices$2.class
+restfulwebservices/ConTAMServices$1.class
