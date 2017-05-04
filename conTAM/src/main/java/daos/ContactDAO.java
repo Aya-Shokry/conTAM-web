@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package daos;
 
 import java.util.List;
@@ -23,17 +18,15 @@ public class ContactDAO {
     private static Session session;
     private static ContactDAO contactDAOInstance;
 
+    static {
+        Configuration configuration = new Configuration();
+        configuration.configure("/hibernate.cfg.xml");
+
+        session = configuration.buildSessionFactory(new StandardServiceRegistryBuilder().applySettings(
+                configuration.getProperties()).build()).openSession();
+    }
+
     private ContactDAO() {
-
-        if (session == null) {
-
-            Configuration configuration = new Configuration();
-            configuration.configure("/hibernate.cfg.xml");
-
-            session = configuration.buildSessionFactory(new StandardServiceRegistryBuilder().applySettings(
-                    configuration.getProperties()).build()).openSession();
-        }
-
     }
 
     public static synchronized ContactDAO getInstance() {
@@ -63,15 +56,18 @@ public class ContactDAO {
         session.getTransaction().commit();
 
         contact.setContactPhoneses(null);
+        
+        System.out.println("Contact added succussfully");
         return contact;
     }
 
     public void updateContact(Contact contact) {
 
         session.beginTransaction();
+        contact = (Contact) session.merge(contact);
         session.update(contact);
         session.getTransaction().commit();
-
+        System.out.println("User updated succussfully");
     }
 
     public void deleteContact(Contact contact) {
@@ -79,7 +75,7 @@ public class ContactDAO {
         session.beginTransaction();
         session.delete(contact);
         session.getTransaction().commit();
-
+        System.out.println("User deleted succussfully");
     }
 
     public List<Contact> getAllContacts(String primaryPhone) {

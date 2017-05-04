@@ -1,11 +1,8 @@
 package daos;
 
-import java.util.HashSet;
-import java.util.Set;
 import org.hibernate.Session;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
-import pojos.Contact;
 import pojos.User;
 import pojos.UserPhones;
 
@@ -23,16 +20,15 @@ public class UserDAO {
     private static Session session;
     private static UserDAO userDAOInstance;
 
+    static {
+        Configuration configuration = new Configuration();
+        configuration.configure("/hibernate.cfg.xml");
+
+        session = configuration.buildSessionFactory(new StandardServiceRegistryBuilder().applySettings(
+                configuration.getProperties()).build()).openSession();
+    }
+
     private UserDAO() {
-
-        if (session == null) {
-            Configuration configuration = new Configuration();
-            configuration.configure("/hibernate.cfg.xml");
-
-            session = configuration.buildSessionFactory(new StandardServiceRegistryBuilder().applySettings(
-                    configuration.getProperties()).build()).openSession();
-        }
-
     }
 
     public static synchronized UserDAO getInstance() {
@@ -48,6 +44,7 @@ public class UserDAO {
         session.persist(user);
         session.getTransaction().commit();
 
+        System.out.println("User registered succussfully");
     }
 
     public User login(String phone, String password) {
@@ -77,8 +74,9 @@ public class UserDAO {
                 .uniqueResult());
 
         session.beginTransaction();
+        user = (User) session.merge(user);
         session.update(user);
-        
+
         for (Object phone : user.getUserPhoneses()) {
             ((UserPhones) phone).setUser(user);
             session.saveOrUpdate(phone);
@@ -86,6 +84,7 @@ public class UserDAO {
 
         session.getTransaction().commit();
 
+        System.out.println("User updated succussfully");
     }
 
 }
