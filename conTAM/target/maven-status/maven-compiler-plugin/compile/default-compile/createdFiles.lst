@@ -4,7 +4,6 @@ restfulwebservices/ConTAMServices.class
 restfulwebservices/ConTAMServicesInterface.class
 daos/UserDAO.class
 pojos/Contact.class
-com/jets/contam/TestClass.class
 pojos/User.class
 daos/ContactDAO.class
 restfulwebservices/ConTAMServices$2.class

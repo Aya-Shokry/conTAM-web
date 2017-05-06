@@ -6,10 +6,14 @@ import daos.ContactDAO;
 import daos.UserDAO;
 import java.util.List;
 import java.util.Set;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.annotation.XmlElement;
 import pojos.Contact;
 import pojos.User;
 import pojos.UserPhones;
@@ -21,11 +25,11 @@ import pojos.UserPhones;
 @Path("/service")
 public class ConTAMServices implements ConTAMServicesInterface {
 
-    @GET
+    @POST
     @Path("/registerUser")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Override
-    public void registerUser(@QueryParam(value = "user") String userStr) {
-
+    public void registerUser(@XmlElement String userStr) {
         UserDAO.getInstance().registerUser(new Gson().fromJson(userStr, User.class));
     }
 
