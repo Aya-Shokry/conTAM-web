@@ -7,6 +7,7 @@ import daos.UserDAO;
 import java.util.List;
 import java.util.Set;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -33,12 +34,12 @@ public class ConTAMServices implements ConTAMServicesInterface {
         UserDAO.getInstance().registerUser(new Gson().fromJson(userStr, User.class));
     }
 
-    @GET
+    @POST
     @Path("/login")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     @Override
-    public String login(@QueryParam(value = "primaryPhone") String primaryPhone,
-            @QueryParam(value = "password") String password) {
+    public String login(@FormParam("primaryPhone") String primaryPhone,
+            @FormParam("password") String password) {
 
         return new Gson().toJson(UserDAO.getInstance().login(primaryPhone, password), User.class);
     }
